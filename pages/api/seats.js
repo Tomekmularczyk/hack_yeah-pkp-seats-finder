@@ -1,4 +1,4 @@
-const SEATS_AVAILABLE = 6;
+const SEATS_AVAILABLE = 3;
 
 let seatsTaken = 0;
 
