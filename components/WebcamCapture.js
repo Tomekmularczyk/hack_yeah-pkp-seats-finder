@@ -12,7 +12,7 @@ export default function WebcamCapture({ onScreenCapture }) {
 
   React.useEffect(capture, []); //initial before setTimeout
 
-  useInterval(capture, 3000);
+  useInterval(capture, 2000);
 
   return (
     <>

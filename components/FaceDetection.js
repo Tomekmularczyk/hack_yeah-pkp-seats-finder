@@ -8,7 +8,7 @@ function useDetectFaces(image) {
     const detectOnImage = async () => {
       const el = document.createElement("img");
       el.src = image;
-      const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
+      const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.3 });
       const detections = await faceapi.detectAllFaces(el, options);
       setDetectionList(detections);
       api.postNrSeats(detections.length);
