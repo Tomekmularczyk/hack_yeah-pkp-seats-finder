@@ -1,8 +1,6 @@
 import React from "react";
-import FacesCount from "./FacesCount";
 import WebcamCapture from "./WebcamCapture";
 import * as faceapi from "face-api.js";
-import * as api from "./api";
 
 function useLoadModel() {
   const [isLoaded, setIsLoaded] = React.useState(false);
@@ -11,7 +9,8 @@ function useLoadModel() {
     const loadModels = async () => {
       const MODEL_URL = "static/weights";
       try {
-        await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
+        await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
+        await faceapi.loadFaceExpressionModel(MODEL_URL);
       } catch (e) {
         console.error("couldn't load model");
       }
@@ -24,68 +23,73 @@ function useLoadModel() {
   return { isLoaded };
 }
 
-function useDetectFaces(image, isLoaded) {
-  const [detectionList, setDetectionList] = React.useState([]);
+const detectionsStub = {
+  expressions: {
+    happy: 0
+  }
+};
+function useDetectExpression(image, isLoaded, videoRef) {
+  const [detection, setDetection] = React.useState(detectionsStub);
 
   React.useEffect(() => {
+    const video = videoRef.current;
     const detectOnImage = async () => {
       const el = document.createElement("img");
       el.src = image;
-      const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
-      const detections = await faceapi.detectAllFaces(el, options);
-      setDetectionList(detections);
-      api.postNrSeats(detections.length);
+      const options = new faceapi.TinyFaceDetectorOptions({});
+      const result = await faceapi
+        .detectSingleFace(el, options)
+        .withFaceExpressions();
+      setDetection(result || detectionsStub);
       el.remove();
     };
-    if (isLoaded) {
+    if (isLoaded && video) {
       detectOnImage();
     }
   }, [image, isLoaded]);
 
-  return detectionList;
+  return detection;
 }
 
-function useDrawBoxes(canvasRef, videoRef, results) {
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    if (canvas && video) {
-      video.width = 600;
-      video.height = 600;
-      const dims = faceapi.matchDimensions(canvas, video, true);
-      faceapi.draw.drawDetections(canvas, faceapi.resizeResults(results, dims));
-    }
-  }, [results]);
-}
+// function useDrawBoxes(canvasRef, videoRef, results) {
+//   React.useEffect(() => {
+//     const canvas = canvasRef.current;
+//     const video = videoRef.current;
+//     if (canvas && video) {
+//       video.width = 600;
+//       video.height = 600;
+//       const dims = faceapi.matchDimensions(canvas, video, true);
+//       faceapi.draw.drawDetections(canvas, faceapi.resizeResults(results, dims));
+//     }
+//   }, [results]);
+// }
 
 function App() {
   const canvasRef = React.useRef();
   const videoRef = React.useRef();
   const [image, setImage] = React.useState();
   const { isLoaded } = useLoadModel();
-  const detectionsList = useDetectFaces(image, isLoaded);
-  useDrawBoxes(canvasRef, videoRef, detectionsList);
+  const { expressions } = useDetectExpression(image, isLoaded, videoRef);
+
+  const happinessFactor = expressions.happy;
 
   return (
     <div className="App">
       <WebcamCapture videoRef={videoRef} onScreenCapture={setImage} />
-      <canvas ref={canvasRef} />
-      {isLoaded ? (
-        <FacesCount nrOfFaces={detectionsList.length} />
-      ) : (
-        "Loading models..."
-      )}
+      <h3>
+        {isLoaded ? (
+          <>{happinessFactor > 0.9 ? "KEEP ON SMILING!" : "Smile a little!"}</>
+        ) : (
+          "Loading models..."
+        )}
+      </h3>
       <style jsx global>{`
         .webcam-video {
           width: 100%;
           height: calc(100vh - 3rem);
         }
-        canvas {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: calc(100vh - 3rem);
+        h3 {
+          margin: 0;
         }
       `}</style>
     </div>
