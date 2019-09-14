@@ -5,7 +5,7 @@ let seatsTaken = 0;
 const handleGETNrOfSeats = (req, res) => {
   res.status(200).json({
     seatsTaken,
-    emptySeats: SEATS_AVAILABLE - seatsTaken
+    emptySeats: seatsTaken > SEATS_AVAILABLE ? 0 : SEATS_AVAILABLE - seatsTaken
   });
 };
 

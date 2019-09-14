@@ -1,7 +1,8 @@
 import React from "react";
-import FaceDetection from "./FaceDetection";
+import FacesCount from "./FacesCount";
 import WebcamCapture from "./WebcamCapture";
 import * as faceapi from "face-api.js";
+import * as api from "./api";
 
 function useLoadModel() {
   const [isLoaded, setIsLoaded] = React.useState(false);
@@ -23,16 +24,42 @@ function useLoadModel() {
   return { isLoaded };
 }
 
+function useDetectFaces(image, isLoaded) {
+  const [detectionList, setDetectionList] = React.useState([]);
+
+  React.useEffect(() => {
+    const detectOnImage = async () => {
+      const el = document.createElement("img");
+      el.src = image;
+      const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
+      const detections = await faceapi.detectAllFaces(el, options);
+      setDetectionList(detections);
+      api.postNrSeats(detections.length);
+      el.remove();
+    };
+    if (isLoaded) {
+      detectOnImage();
+    }
+  }, [image, isLoaded]);
+
+  return detectionList;
+}
+
 function App() {
   const [image, setImage] = React.useState();
   const { isLoaded } = useLoadModel();
+  const detectionsList = useDetectFaces(image, isLoaded);
   const handleScreenCapture = img => {
     setImage(img);
   };
   return (
     <div className="App">
       <WebcamCapture onScreenCapture={handleScreenCapture} />
-      {isLoaded ? <FaceDetection image={image} /> : "Loading models..."}
+      {isLoaded ? (
+        <FacesCount nrOfFaces={detectionsList.length} />
+      ) : (
+        "Loading models..."
+      )}
     </div>
   );
 }
