@@ -2,24 +2,22 @@ import React from "react";
 import Webcam from "react-webcam";
 import useInterval from "@use-hooks/interval";
 
-export default function WebcamCapture({ onScreenCapture }) {
-  const webcamRef = React.useRef(null);
-
+export default function WebcamCapture({ videoRef, onScreenCapture }) {
   const capture = React.useCallback(() => {
-    const imageSrc = webcamRef.current.getScreenshot();
+    const imageSrc = videoRef.current.getScreenshot();
     onScreenCapture(imageSrc);
-  }, [webcamRef, onScreenCapture]);
+  }, [videoRef, onScreenCapture]);
 
   React.useEffect(capture, []); //initial before setTimeout
 
-  useInterval(capture, 2000);
+  useInterval(capture, 1000);
 
   return (
     <>
       <Webcam
         audio={false}
         className="webcam-video"
-        ref={webcamRef}
+        ref={videoRef}
         screenshotFormat="image/jpeg"
         videoConstraints={{
           width: 1280,
@@ -27,12 +25,6 @@ export default function WebcamCapture({ onScreenCapture }) {
           facingMode: "environment"
         }}
       />
-      <style jsx global>{`
-        .webcam-video {
-          width: 100%;
-          height: calc(100vh - 3rem);
-        }
-      `}</style>
     </>
   );
 }

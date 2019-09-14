@@ -45,21 +45,49 @@ function useDetectFaces(image, isLoaded) {
   return detectionList;
 }
 
+function useDrawBoxes(canvasRef, videoRef, results) {
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    if (canvas && video) {
+      video.width = 600;
+      video.height = 600;
+      const dims = faceapi.matchDimensions(canvas, video, true);
+      faceapi.draw.drawDetections(canvas, faceapi.resizeResults(results, dims));
+    }
+  }, [results]);
+}
+
 function App() {
+  const canvasRef = React.useRef();
+  const videoRef = React.useRef();
   const [image, setImage] = React.useState();
   const { isLoaded } = useLoadModel();
   const detectionsList = useDetectFaces(image, isLoaded);
-  const handleScreenCapture = img => {
-    setImage(img);
-  };
+  useDrawBoxes(canvasRef, videoRef, detectionsList);
+
   return (
     <div className="App">
-      <WebcamCapture onScreenCapture={handleScreenCapture} />
+      <WebcamCapture videoRef={videoRef} onScreenCapture={setImage} />
+      <canvas ref={canvasRef} />
       {isLoaded ? (
         <FacesCount nrOfFaces={detectionsList.length} />
       ) : (
         "Loading models..."
       )}
+      <style jsx global>{`
+        .webcam-video {
+          width: 100%;
+          height: calc(100vh - 3rem);
+        }
+        canvas {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: calc(100vh - 3rem);
+        }
+      `}</style>
     </div>
   );
 }
