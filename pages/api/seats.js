@@ -10,7 +10,6 @@ const handleGETNrOfSeats = (req, res) => {
 };
 
 const handlePOSTNrOfSeats = (req, res) => {
-  console.log(req.body);
   const { nrOfPeople } = req.body;
   seatsTaken = nrOfPeople;
   return res.status(200).json({ message: "Updated" });
@@ -18,10 +17,12 @@ const handlePOSTNrOfSeats = (req, res) => {
 
 export default (req, res) => {
   switch (req.method) {
-    case "GET":
+    case "GET": {
       return handleGETNrOfSeats(req, res);
-    case "POST":
+    }
+    case "POST": {
       return handlePOSTNrOfSeats(req, res);
+    }
     default:
       return res.status(400).json({ message: "Unknown method" });
   }

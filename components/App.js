@@ -9,11 +9,12 @@ function useLoadModel() {
   React.useEffect(() => {
     const loadModels = async () => {
       const MODEL_URL = "static/weights";
-      await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
-      await faceapi.loadFaceLandmarkModel(MODEL_URL);
-      await faceapi.loadFaceRecognitionModel(MODEL_URL);
+      try {
+        await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
+      } catch (e) {
+        console.error("couldn't load model");
+      }
       setIsLoaded(true);
-      console.log("face detection model loaded");
     };
 
     loadModels();
@@ -26,13 +27,12 @@ function App() {
   const [image, setImage] = React.useState();
   const { isLoaded } = useLoadModel();
   const handleScreenCapture = img => {
-    console.log("handleScreenShot");
     setImage(img);
   };
   return (
     <div className="App">
       <WebcamCapture onScreenCapture={handleScreenCapture} />
-      {isLoaded && <FaceDetection image={image} />}
+      {isLoaded ? <FaceDetection image={image} /> : "Loading models..."}
     </div>
   );
 }

@@ -15,17 +15,24 @@ export default function WebcamCapture({ onScreenCapture }) {
   useInterval(capture, 3000);
 
   return (
-    <Webcam
-      audio={false}
-      height={500}
-      ref={webcamRef}
-      screenshotFormat="image/jpeg"
-      width={1000}
-      videoConstraints={{
-        width: 1280,
-        height: 720,
-        facingMode: "environment"
-      }}
-    />
+    <>
+      <Webcam
+        audio={false}
+        className="webcam-video"
+        ref={webcamRef}
+        screenshotFormat="image/jpeg"
+        videoConstraints={{
+          width: 1280,
+          height: 720,
+          facingMode: "environment"
+        }}
+      />
+      <style jsx global>{`
+        .webcam-video {
+          width: 100%;
+          height: calc(100vh - 3rem);
+        }
+      `}</style>
+    </>
   );
 }

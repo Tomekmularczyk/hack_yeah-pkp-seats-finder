@@ -10,9 +10,9 @@ function useDetectFaces(image) {
       el.src = image;
       const options = new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 });
       const detections = await faceapi.detectAllFaces(el, options);
-      console.log("Detected");
       setDetectionList(detections);
       api.postNrSeats(detections.length);
+      el.remove();
     };
     detectOnImage();
   }, [image]);
@@ -23,8 +23,12 @@ export default function FaceDetection({ image }) {
   const detectionsList = useDetectFaces(image);
   return (
     <div>
-      <br />
-      <h2>Faces detected: {detectionsList.length}</h2>
+      <h3>Faces detected: {detectionsList.length}</h3>
+      <style jsx>{`
+        h3 {
+          margin: 0;
+        }
+      `}</style>
     </div>
   );
 }
