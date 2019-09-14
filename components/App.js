@@ -11,7 +11,7 @@ function useLoadModel() {
     const loadModels = async () => {
       const MODEL_URL = "static/weights";
       try {
-        await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
+        await faceapi.loadSsdMobilenetv1Model(MODEL_URL);
       } catch (e) {
         console.error("couldn't load model");
       }
@@ -31,9 +31,9 @@ function useDetectFaces(image, isLoaded) {
     const detectOnImage = async () => {
       const el = document.createElement("img");
       el.src = image;
-      const options = new faceapi.TinyFaceDetectorOptions({
-        inputSize: 800,
-        scoreThreshold: 0.5
+      const options = new faceapi.SsdMobilenetv1Options({
+        minConfidence: 0.7,
+        maxResults: 5
       });
       const detections = await faceapi.detectAllFaces(el, options);
       setDetectionList(detections);
