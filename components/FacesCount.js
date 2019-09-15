@@ -3,10 +3,11 @@ import React from "react";
 export default function FacesCount({ nrOfFaces }) {
   return (
     <div>
-      <h3>Faces detected: {nrOfFaces}</h3>
+      <h2>Faces detected: {nrOfFaces}</h2>
       <style jsx>{`
-        h3 {
+        h2 {
           margin: 0;
+          text-align: center;
         }
       `}</style>
     </div>
