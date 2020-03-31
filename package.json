@@ -10,7 +10,7 @@
   "dependencies": {
     "@use-hooks/interval": "^1.0.1",
     "face-api.js": "^0.20.1",
-    "next": "9.0.5",
+    "next": "9.3.2",
     "react": "16.9.0",
     "react-dom": "16.9.0",
     "react-webcam": "^3.0.1",
